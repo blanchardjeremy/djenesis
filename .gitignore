@@ -1,0 +1,4 @@
+.*.sw*
+*~
+*.pyc
+mainsite/local_settings.py

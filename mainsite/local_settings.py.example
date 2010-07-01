@@ -1,0 +1,37 @@
+from os import path
+
+DEBUG = True
+TEMPLATE_DEBUG = DEBUG
+
+ADMINS = (
+    # ('Your Name', 'your_email@domain.com'),
+)
+MANAGERS = ADMINS
+
+# DATABASE_ENGINE = ''           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+# DATABASE_NAME = ''
+# DATABASE_USER = ''
+# DATABASE_PASSWORD = ''
+# DATABASE_HOST = ''             # Set to empty string for localhost.
+# DATABASE_PORT = ''             # Set to empty string for default.
+
+#DATABASE_ENGINE = 'sqlite3'
+#DATABASE_NAME = path.join(TOP_DIR, 'local.sqlite')
+
+#CACHE_BACKEND='memcached://127.0.0.1:11211/'
+
+
+def setup(settings):
+    """
+    This function is called before the final settings are passed to
+    django.
+
+    This hook can be used to modify the value of settings
+    rather than overwriting them.
+    """
+    # Ex: install an app:
+    # settings['INSTALLED_APPS'].extend([
+    #     'my_debug_app',
+    # ])
+    
+    pass
