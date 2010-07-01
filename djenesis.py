@@ -47,7 +47,6 @@ def main():
     parser.add_option("-u", "--django-url", help="specify the URL to fetch django from")
     parser.add_option("-n", "--no-django", help="Dont fetch django into lib/django automatically", action="store_true", default=False)
     (options, args) = parser.parse_args()
-    print options
     if len(args) < 1:
         parser.print_help()
         sys.exit(1)

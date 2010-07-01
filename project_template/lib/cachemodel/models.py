@@ -15,18 +15,31 @@
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
+from cachemodel import ns_cache
 import datetime
 
 class CacheModelManager(models.Manager):
-    def get_by_pk(self, pk, cache_timeout=None):
+    def get_by(self, field_name, field_value, cache_timeout=None):
         if cache_timeout is None:
             cache_timeout = getattr(settings, 'CACHE_TIMEOUT', 900)
-        key = self.model.cache_key("by_pk", pk)
+
+        # cache the field names that have been used so flush_cache can purge them
+        cached_field_names = cache.get( self.model.cache_key("__cached_field_names__") )
+        if cached_field_names is None:
+            cached_field_names = set()
+        cached_field_names.add(field_name)
+        cache.set(self.model.cache_key("__cached_field_names__"), cached_field_names, cache_timeout)
+        
+        key = self.model.cache_key("by_"+field_name, field_value)
         obj = cache.get(key)
         if obj is None:
-            obj = self.get(pk=pk)
+            obj = self.get(**{field_name: field_value})
             cache.set(key, obj, cache_timeout)
         return obj
+
+    def get_by_pk(self, pk, cache_timeout=None):
+        return self.get_by("pk",pk)
+
 
 class CacheModel(models.Model):
     objects = CacheModelManager()
@@ -40,13 +53,23 @@ class CacheModel(models.Model):
         self.flush_cache()
         super(CacheModel, self).delete(*args, **kwargs)
     def flush_cache(self):
-        cache.delete(self.cache_key("by_pk", self.pk))
+        cached_field_names = cache.get( self.cache_key("__cached_field_names__") ) 
+        if cached_field_names is not None:
+            for field_name in cached_field_names:
+                cache.delete( self.cache_key("by_"+field_name, getattr(self, field_name)) )
+        self.ns_flush_cache()
+    def ns_cache_key(self, *args):
+        return ns_cache.ns_key(self.cache_key(self.pk), '_'.join(str(a) for a in args))
+    def ns_flush_cache(self):
+        ns_cache.ns_flush(self.cache_key(self.pk))
+
     @classmethod
     def cache_key(cls, *args):
         key = cls.__name__
         for arg in args:
             key += '_'+str(arg)
         return key
+
 
 class ActiveManager(CacheModelManager):
     use_for_related_fields = True
@@ -76,14 +99,7 @@ class DefaultUserModel(UserModel, DefaultModel):
 
 class SlugModelManager(CacheModelManager):
     def get_by_slug(self, slug, cache_timeout=None):
-        if cache_timeout is None:
-            cache_timeout = getattr(settings, 'CACHE_TIMEOUT', 900)
-        key = self.model.cache_key("by_slug", slug)
-        obj = cache.get(key)
-        if obj is None:
-            obj = self.get(slug=slug)
-            cache.set(key, obj, cache_timeout)
-        return obj
+        return self.get_by("slug", slug, cache_timeout)
         
 
 class SlugModel(DefaultModel):
@@ -95,31 +111,18 @@ class SlugModel(DefaultModel):
         abstract = True
     def __unicode__(self):
         return self.name
-    def flush_cache(self):
-        super(SlugModel, self).flush_cache()
-        cache.delete(self.cache_key("by_slug", self.slug))
 
 
 
 def cached_method(cache_timeout, cache_key):
     def decorator(target):
         def wrapper(self, *args, **kwargs):
-            if callable(cache_key):
-                key = cache_key(self) 
-            else:
-                key = cache_key
-
-            if not isinstance(key, (unicode, str)):
-                key = '_'.join( str(a) for a in key )
-            key = self.__class__.__name__ + '_' + key
-
+            key = self.ns_cache_key(cache_key)
             chunk = cache.get(key)
             if chunk is None:
                 chunk = target(self, *args, **kwargs)
-                if chunk is not None:
-                    cache.set(key, chunk, cache_timeout)
+                cache.set(key, chunk, cache_timeout)
             return chunk
-
         return wrapper
     return decorator
 

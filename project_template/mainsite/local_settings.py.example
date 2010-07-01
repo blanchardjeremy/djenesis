@@ -1,5 +1,8 @@
 from os import path
 
+PROJECT_DIR = path.abspath(path.dirname(__file__).decode('utf-8'))
+TOP_DIR = path.abspath(path.dirname(PROJECT_DIR).decode('utf-8'))
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
