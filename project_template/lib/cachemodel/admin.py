@@ -13,8 +13,9 @@
 #  limitations under the License.
 
 import datetime
+from django.contrib import admin
 
-class DefaultModelAdmin(ModelAdmin):
+class DefaultModelAdmin(admin.ModelAdmin):
     save_on_top = True
     def save_model(self, request, obj, form, change):
         instance = form.save(commit=False)
