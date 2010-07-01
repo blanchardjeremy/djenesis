@@ -97,7 +97,7 @@ class DefaultUserModel(UserModel, DefaultModel):
     class Meta:
         abstract = True
 
-class SlugModelManager(CacheModelManager):
+class SlugModelManager(ActiveManager):
     def get_by_slug(self, slug, cache_timeout=None):
         return self.get_by("slug", slug, cache_timeout)
         
