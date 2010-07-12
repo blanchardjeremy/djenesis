@@ -1,8 +1,7 @@
 import sys
 import os
-import os.path
 
-TOP_DIR = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__).decode('utf-8'))).decode('utf-8'))
+TOP_DIR = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 LIB_DIR = os.path.join(TOP_DIR, 'lib')
 PROJECT_DIR = os.path.join(TOP_DIR, 'mainsite')
 

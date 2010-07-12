@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+"""
+djenesis is a toole for inflating a new Django project
+"""
+
 import sys
 import shutil
 import os

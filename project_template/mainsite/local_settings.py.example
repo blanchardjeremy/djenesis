@@ -1,7 +1,7 @@
-from os import path
+import os
 
-PROJECT_DIR = path.abspath(path.dirname(__file__).decode('utf-8'))
-TOP_DIR = path.abspath(path.dirname(PROJECT_DIR).decode('utf-8'))
+PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
+TOP_DIR = os.path.abspath(os.path.dirname(PROJECT_DIR))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -19,7 +19,7 @@ MANAGERS = ADMINS
 # DATABASE_PORT = ''             # Set to empty string for default.
 
 #DATABASE_ENGINE = 'sqlite3'
-#DATABASE_NAME = path.join(TOP_DIR, 'local.sqlite')
+#DATABASE_NAME = os.path.join(TOP_DIR, 'local.sqlite')
 
 #CACHE_BACKEND='memcached://127.0.0.1:11211/'
 

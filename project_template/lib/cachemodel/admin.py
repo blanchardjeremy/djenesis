@@ -16,6 +16,7 @@ import datetime
 from django.contrib import admin
 
 class DefaultModelAdmin(admin.ModelAdmin):
+    """a ModelAdmin that will automatically update created_at/updated_at and created_by/updated_by fields"""
     save_on_top = True
     def save_model(self, request, obj, form, change):
         instance = form.save(commit=False)
@@ -42,5 +43,6 @@ class DefaultModelAdmin(admin.ModelAdmin):
             instance.updated_at = now
 
 class SlugModelAdmin(DefaultModelAdmin):
+    """An implementaiton of DefaultModelAdmin that will automatically generate slugs""" 
     prepopulated_fields = {"slug": ("name",)}
 

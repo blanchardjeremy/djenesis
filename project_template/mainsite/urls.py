@@ -6,15 +6,13 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
 
-
     (r'^admin/', include(admin.site.urls)),
 )
 
 
-# Serve static media when DEBUG is on (development-use only).
 if settings.DEBUG:
+    # If we are in debug mode, prepend a rule to urlpatterns to serve the static media
     import re
-    
     urlpatterns = patterns('',
         url(r'^%s/(?P<path>.*)$' % re.escape(settings.MEDIA_URL.strip('/')), 
           'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),

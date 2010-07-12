@@ -9,8 +9,9 @@ PROJECT_DIR = path.abspath(path.dirname(__file__).decode('utf-8'))
 TOP_DIR = path.abspath(path.dirname(PROJECT_DIR).decode('utf-8'))
 # Required python libraries should go in this directory 
 LIB_DIR = path.join(TOP_DIR,"lib")
+# Apps written for the project go in this directory
 APP_DIR = path.join(TOP_DIR,"apps")
-# Include in the python path.
+# Prepend the above directories to the python path
 for p in (PROJECT_DIR, TOP_DIR, LIB_DIR, APP_DIR):
     if p not in sys.path:
         sys.path.insert(0,p)
@@ -116,7 +117,7 @@ if path.exists(path.join(PROJECT_DIR, 'fixtures')):
 def load_local_settings():
     """
     Load the settings defined in the mainsite.local_settings module.
-    
+
     Once all settings are loaded, call local_settings.setup with a
     dictionary of the final settings.
     """
