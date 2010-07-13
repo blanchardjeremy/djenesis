@@ -100,9 +100,7 @@ def main():
         os.path.join(args[0], "mainsite", "local_settings.py.example"),
         os.path.join(args[0], "mainsite", "local_settings.py"),
         )
-        
 
-    
 
 if __name__ == '__main__':
     main()
