@@ -25,7 +25,7 @@ def generate_secret_key():
 
 def do_copy(template_dir, destination_dir):
     #print "template: %s\ndestination: %s\n" % (template_dir, destination_dir)
-    shutil.copytree(template_dir, destination_dir, symlinks=True)
+    shutil.copytree(template_dir, destination_dir, symlinks=True, ignore=shutil.ignore_patterns('.svn*'))
 
     secret_key = generate_secret_key()
 

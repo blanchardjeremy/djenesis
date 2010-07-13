@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     'django.contrib.admin',
 
     'mainsite',
-    'cachemodel',
 ]
 
 # List of callables that know how to import templates from various sources.
