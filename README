@@ -1,0 +1,43 @@
+= Djenesis =
+
+==== A tool to inflate a new django project from a standard template ====
+
+Djenesis offers you a "1-click" install to start a new django project. 
+Djenesis has no dependencies other than a standard python install.
+
+Djenesis creates a new project directory, inflates a django project from a standard template, then fetches the stable django source code and places it in the project directory.
+
+
+== Project Structure ==
+
+The template djenesis uses is found in the 'project_template' directory that is installed along with djenesis:
+
+  apps/               -- django apps you write for this project should go here (automatically added to PYTHON_PATH)
+  lib/                -- python or django libraries written by 3rd parties should go here (automatically added to PYTHON_PATH)
+  mainsite/           -- the main django app, settings and url dispatch go through here
+  mainsite/urls.py               -- top level urls.py; all URL dispatch goes through here
+  mainsite/shortcuts.py          -- contains useful shortcuts, most importantly render_template()
+  mainsite/context_processors.py -- a default_context processor, default_context will be available everytime you use render_template()
+  mainsite/settings.py           -- project-wide settings. settings that are the same across all installs go here
+  mainsite/local_settings.py     -- install-wide settings. settings that differ across machines go here (database credentials, caching backend, etc)
+  etc/start.wsgi      -- a sample wsgi script that adds apps and lib to the PYTHON_PATH and calls mainsite
+  templates/base.html -- a basic template
+
+
+
+== Usage ==
+
+Usage: djenesis.py [options] <new-project-directory>
+
+Options:
+  -h, --help            show this help message and exit
+  -t TEMPLATE_DIR, --template-dir=TEMPLATE_DIR
+                        specify a different template directory
+  -d DJANGO_VERSION, --django-version=DJANGO_VERSION
+                        specify a django version to fetch and extract
+  -u DJANGO_URL, --django-url=DJANGO_URL
+                        specify the URL to fetch django from
+  -n, --no-django       Dont fetch django into lib/django automatically
+
+
+

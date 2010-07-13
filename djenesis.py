@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-
 """
-djenesis is a toole for inflating a new Django project
+djenesis is a tool for inflating a new Django project
 """
+VERSION = (0,9,0)
 
 import sys
 import shutil
