@@ -49,7 +49,7 @@ def main():
     parser.add_option("-t", "--template-dir", help="specify a different template directory")
     parser.add_option("-d", "--django-version", help="specify a django version to fetch and extract", default='1.2.1')
     parser.add_option("-u", "--django-url", help="specify the URL to fetch django from")
-    parser.add_option("-n", "--no-django", help="Dont fetch django into lib/django automatically", action="store_true", default=False)
+    parser.add_option("-n", "--no-django", help="Don't fetch django into lib/django automatically", action="store_true", default=False)
     (options, args) = parser.parse_args()
     if len(args) < 1:
         parser.print_help()

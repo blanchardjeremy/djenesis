@@ -1,4 +1,3 @@
-# Django settings for {{ project_name }} project.
 import imp
 import sys
 from os import path
@@ -11,8 +10,8 @@ TOP_DIR = path.abspath(path.dirname(PROJECT_DIR).decode('utf-8'))
 LIB_DIR = path.join(TOP_DIR,"lib")
 # Apps written for the project go in this directory
 APP_DIR = path.join(TOP_DIR,"apps")
-# Prepend the above directories to the python path
-for p in (PROJECT_DIR, TOP_DIR, LIB_DIR, APP_DIR):
+# Prepend LIB_DIR, PROJECT_DIR, and APP_DIR to the PYTHONPATH
+for p in (PROJECT_DIR, LIB_DIR, APP_DIR, TOP_DIR):
     if p not in sys.path:
         sys.path.insert(0,p)
 
@@ -54,7 +53,6 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
     'django.core.context_processors.request',
-    'mainsite.context_processors.default_context',
 ]
 
 
