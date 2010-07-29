@@ -4,16 +4,15 @@ djenesis is a tool for inflating a new Django project
 """
 VERSION = (0,9,0)
 
-import sys
-import shutil
-import os
-import re
-import random
-import urllib2
-import tarfile
-import StringIO
-
 from optparse import OptionParser
+import StringIO
+import os
+import random
+import re
+import shutil
+import sys
+import tarfile
+import urllib2
 
 def generate_secret_key():
     """Generate a random value for settings.SECRET_KEY."""
@@ -22,10 +21,55 @@ def generate_secret_key():
             for i in range(50)]
     )
 
+def my_copytree(src, dst, symlinks=False, ignore=None):
+    """Yanked and forked from python2.6/shutil.py
+
+    Modified to allow destination directory to exist
+    """
+    names = os.listdir(src)
+    if ignore is not None:
+        ignored_names = ignore(src, names)
+    else:
+        ignored_names = set()
+
+    if not os.path.isdir(dst):
+        os.makedirs(dst)
+    errors = []
+    for name in names:
+        if name in ignored_names:
+            continue
+        srcname = os.path.join(src, name)
+        dstname = os.path.join(dst, name)
+        try:
+            if symlinks and os.path.islink(srcname):
+                linkto = os.readlink(srcname)
+                os.symlink(linkto, dstname)
+            elif os.path.isdir(srcname):
+                my_copytree(srcname, dstname, symlinks, ignore)
+            else:
+                shutil.copy2(srcname, dstname)
+            # XXX What about devices, sockets etc.?
+        except (IOError, os.error), why:
+            errors.append((srcname, dstname, str(why)))
+        # catch the Error from the recursive copytree so that we can
+        # continue with other files
+        except shutil.Error, err:
+            errors.extend(err.args[0])
+    try:
+        shutil.copystat(src, dst)
+    except OSError, why:
+        if WindowsError is not None and isinstance(why, WindowsError):
+            # Copying file access times may fail on Windows
+            pass
+        else:
+            errors.extend((src, dst, str(why)))
+    if errors:
+        raise shutil.Error, errors
+
 
 def do_copy(template_dir, destination_dir):
     #print "template: %s\ndestination: %s\n" % (template_dir, destination_dir)
-    shutil.copytree(template_dir, destination_dir, symlinks=True, ignore=shutil.ignore_patterns('.svn*'))
+    my_copytree(template_dir, destination_dir, symlinks=True, ignore=shutil.ignore_patterns('.svn*'))
 
     secret_key = generate_secret_key()
 

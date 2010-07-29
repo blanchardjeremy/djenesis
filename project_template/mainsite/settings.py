@@ -110,6 +110,34 @@ TEMPLATE_DIRS = [
 if path.exists(path.join(PROJECT_DIR, 'fixtures')):
     FIXTURE_DIRS = ['fixtures']
 
+def filter_settings(settings_dict):
+    """
+    Filters a dict by uppercase keys.  Returns a new dictionary
+    which contains only the items which have uppercase keys.
+    """
+    return dict(
+        filter(lambda (k, v): k.isupper(), settings_dict.items())
+    )
+
+def load_app_settings():
+    """ Iterate over INSTALLED_APPS and load any settings.py """
+    settings_dict = globals()
+    for app in INSTALLED_APPS:
+        #skip mainsite or builtin django apps 
+        if app == 'mainsite' or app[:7] == 'django.':
+            continue
+
+        try:
+            #import the app's settings module
+            settings_module = '%s.settings' % (app,)
+            __import__(settings_module)
+
+            #update our settings with app's settings
+            settings_dict.update(
+                filter_settings(sys.modules[settings_module].__dict__)
+            )
+        except ImportError:
+            pass
 
 def load_local_settings():
     """
@@ -120,14 +148,6 @@ def load_local_settings():
     """
     from mainsite import local_settings
 
-    def filter_settings(settings_dict):
-        """
-        Filters a dict by uppercase keys.  Returns a new dictionary
-        which contains only the items which have uppercase keys.
-        """
-        return dict(
-            filter(lambda (k, v): k.isupper(), settings_dict.items())
-        )
 
     settings_dict = globals() # dict of our main settings.
 
@@ -141,6 +161,9 @@ def load_local_settings():
     # final settings dict.
     if hasattr(local_settings, 'setup') and callable(local_settings.setup):
         local_settings.setup(settings_dict)
+
+# Load any settings from INSTALLED_APPS
+load_app_settings()
 
 # Load additional settings from the mainsite.local_settings module,
 # if it exists.
