@@ -14,6 +14,7 @@ import urllib2
 import random
 
 
+
 def package_data(file_name):
     return os.path.join(os.path.split(__file__)[0], file_name)
 
@@ -122,6 +123,15 @@ def main():
     ret = do_copy(template_dir, code_dir)
     if ret != 0:
         sys.exit(ret)
+
+    if options.virtualenv:
+        try:
+            import virtualenv
+            virtualenv.logger = virtualenv.Logger([(virtualenv.Logger.level_for_integer(2), sys.stdout)])
+            virtualenv.create_environment(env_dir, site_packages=False, clear=True,  use_distribute=True)
+        except ImportError:
+            print "Failed to import virtualenv, is it installed?"
+            sys.exit(1)
 
 #    if not options.no_django:
 #        django_url = options.django_url
