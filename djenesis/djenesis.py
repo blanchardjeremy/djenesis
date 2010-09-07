@@ -2,24 +2,28 @@
 """
 djenesis is a tool for inflating a new Django project
 """
-VERSION = (0,9,0)
 
 from optparse import OptionParser
 import StringIO
 import os
-import random
 import re
 import shutil
 import sys
 import tarfile
 import urllib2
+import random
+
+
+def package_data(file_name):
+    return os.path.join(os.path.split(__file__)[0], file_name)
+
 
 def generate_secret_key():
     """Generate a random value for settings.SECRET_KEY."""
     return ''.join(
-        [random.choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
-            for i in range(50)]
+        [random.choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)]
     )
+
 
 def my_copytree(src, dst, symlinks=False, ignore=None):
     """Yanked and forked from python2.6/shutil.py
@@ -66,7 +70,6 @@ def my_copytree(src, dst, symlinks=False, ignore=None):
     if errors:
         raise shutil.Error, errors
 
-
 def do_copy(template_dir, destination_dir):
     #print "template: %s\ndestination: %s\n" % (template_dir, destination_dir)
     my_copytree(template_dir, destination_dir, symlinks=True, ignore=shutil.ignore_patterns('.svn*'))
@@ -91,59 +94,68 @@ def do_copy(template_dir, destination_dir):
 def main():
     parser = OptionParser(usage="usage: %prog [options] <new-project-directory>")
     parser.add_option("-t", "--template-dir", help="specify a different template directory")
-    parser.add_option("-d", "--django-version", help="specify a django version to fetch and extract", default='1.2.1')
-    parser.add_option("-u", "--django-url", help="specify the URL to fetch django from")
-    parser.add_option("-n", "--no-django", help="Don't fetch django into lib/django automatically", action="store_true", default=False)
+    parser.add_option("-e", "--virtualenv", help="additionally create a virtualenv environment", action="store_true", default=False)
+    parser.add_option("", "--env", help="specify the name of the virtualenv directory to create", default="env")
+    parser.add_option("", "--code", help="specify the name of the code directory to create", default="code")
+    parser.add_option("-r", "--requirements", help="specify a requirements.txt file to bootstrap with")
+
     (options, args) = parser.parse_args()
     if len(args) < 1:
         parser.print_help()
         sys.exit(1)
 
-    destination_dir = os.path.abspath(args[0])
+    project_dir = os.path.abspath(args[0])
+    code_dir = os.path.join(project_dir, options.code)
+    env_dir = os.path.join(project_dir, options.env)
+
     template_dir = options.template_dir
     if template_dir is None:
-        template_dir = os.path.join(os.path.abspath(os.path.dirname(__file__).decode('utf-8')), "project_template")
+        #template_dir = os.path.join(os.path.abspath(os.path.dirname(__file__).decode('utf-8')), "project_template")
+        template_dir = package_data("project_template")
     if not os.path.exists(template_dir):
         print "%s: template directory does not exist!" % (template_dir,)
         sys.exit(1)
 
-    ret = do_copy(template_dir, destination_dir) 
+    if not os.path.exists(project_dir):
+        os.makedirs(project_dir)
+
+    ret = do_copy(template_dir, code_dir)
     if ret != 0:
         sys.exit(ret)
 
-    if not options.no_django:
-        django_url = options.django_url
-        if django_url is None:
-            django_url ='http://www.djangoproject.com/download/%s/tarball' % options.django_version
-
-        print "Extracting %s..." % django_url
-
-        tar_buf = StringIO.StringIO()
-        uh = urllib2.urlopen(django_url)
-        tar_buf.write( uh.read() )
-        uh.close()
-        tar_buf.seek(0)
-        tar = tarfile.open(fileobj=tar_buf, mode='r:gz')
-        for item in tar:
-            tar.extract(item, path=destination_dir)
-        tar.close()
-        uh.close()
-
-        symlink_dest = os.path.join(destination_dir,"lib","django")
-
-        if hasattr(os, 'symlink'):
-            os.symlink(os.path.join("..","Django-%s"%options.django_version,"django"),symlink_dest)
-        else:
-            print "Symlinks are not supported on your platform. you need to copy %s to %s manually." % (
-                os.path.join(destination_dir, "Django-%s"%options.django_version, "django"),
-                os.path.join(destination_dir, "lib", "django"),
-                )
-
-    print "Initialized a new djenesis project in %s" % destination_dir
-    print "You now need to copy %s to %s and configure it for your local machine" % (
-        os.path.join(args[0], "mainsite", "local_settings.py.example"),
-        os.path.join(args[0], "mainsite", "local_settings.py"),
-        )
+#    if not options.no_django:
+#        django_url = options.django_url
+#        if django_url is None:
+#            django_url ='http://www.djangoproject.com/download/%s/tarball' % options.django_version
+#
+#        print "Extracting %s..." % django_url
+#
+#        tar_buf = StringIO.StringIO()
+#        uh = urllib2.urlopen(django_url)
+#        tar_buf.write( uh.read() )
+#        uh.close()
+#        tar_buf.seek(0)
+#        tar = tarfile.open(fileobj=tar_buf, mode='r:gz')
+#        for item in tar:
+#            tar.extract(item, path=destination_dir)
+#        tar.close()
+#        uh.close()
+#
+#        symlink_dest = os.path.join(destination_dir,"lib","django")
+#
+#        if hasattr(os, 'symlink'):
+#            os.symlink(os.path.join("..","Django-%s"%options.django_version,"django"),symlink_dest)
+#        else:
+#            print "Symlinks are not supported on your platform. you need to copy %s to %s manually." % (
+#                os.path.join(destination_dir, "Django-%s"%options.django_version, "django"),
+#                os.path.join(destination_dir, "lib", "django"),
+#                )
+#
+    print "Initialized a new djenesis project in %s" % project_dir
+    #print "You now need to copy %s to %s and configure it for your local machine" % (
+        #os.path.join(args[0], "mainsite", "local_settings.py.example"),
+        #os.path.join(args[0], "mainsite", "local_settings.py"),
+        #)
 
 
 if __name__ == '__main__':

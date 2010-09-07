@@ -27,17 +27,16 @@ The template djenesis uses is found in the 'project_template' directory that is 
 
 == Usage ==
 
-Usage: djenesis.py [options] <new-project-directory>
+Usage: djenesis.py [options] <new-project-directory> [pip arguments]
 
 Options:
   -h, --help            show this help message and exit
   -t TEMPLATE_DIR, --template-dir=TEMPLATE_DIR
                         specify a different template directory
-  -d DJANGO_VERSION, --django-version=DJANGO_VERSION
-                        specify a django version to fetch and extract
-  -u DJANGO_URL, --django-url=DJANGO_URL
-                        specify the URL to fetch django from
-  -n, --no-django       Dont fetch django into lib/django automatically
-
-
-
+  -e, --virtualenv      create a virtualenv environment
+  --environment-directory=env
+                        specify the name of the environment directory to create
+  --code-directory=code
+                        specify the name of the code directory to create
+  -r REQUIREMENTS, --requirements=REQUIREMENTS
+                        specify a requirements.txt file to bootstrap the environment with
