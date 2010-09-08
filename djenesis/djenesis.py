@@ -14,7 +14,6 @@ import urllib2
 import random
 
 
-
 def package_data(file_name):
     return os.path.join(os.path.split(__file__)[0], file_name)
 
@@ -71,6 +70,7 @@ def my_copytree(src, dst, symlinks=False, ignore=None):
     if errors:
         raise shutil.Error, errors
 
+
 def do_copy(template_dir, destination_dir):
     #print "template: %s\ndestination: %s\n" % (template_dir, destination_dir)
     my_copytree(template_dir, destination_dir, symlinks=True, ignore=shutil.ignore_patterns('.svn*'))
@@ -88,12 +88,11 @@ def do_copy(template_dir, destination_dir):
         settings_file.close()
     else:
         print "Could not locate %s. Did not generate SECRET_KEY" % (settings_path)
-
-
     return 0
 
+
 def main():
-    parser = OptionParser(usage="usage: %prog [options] <new-project-directory>")
+    parser = OptionParser(usage="usage: %prog [options] <new-project-directory> [package...]")
     parser.add_option("-t", "--template-dir", help="specify a different template directory")
     parser.add_option("-e", "--virtualenv", help="additionally create a virtualenv environment", action="store_true", default=False)
     parser.add_option("", "--env", help="specify the name of the virtualenv directory to create", default="env")
@@ -104,6 +103,9 @@ def main():
     if len(args) < 1:
         parser.print_help()
         sys.exit(1)
+
+    if options.requirements or len(args) > 1:
+        options.virtualenv = True
 
     project_dir = os.path.abspath(args[0])
     code_dir = os.path.join(project_dir, options.code)
@@ -127,11 +129,28 @@ def main():
     if options.virtualenv:
         try:
             import virtualenv
+            #monkey patching in the logger is required here...
             virtualenv.logger = virtualenv.Logger([(virtualenv.Logger.level_for_integer(2), sys.stdout)])
-            virtualenv.create_environment(env_dir, site_packages=False, clear=True,  use_distribute=True)
+            virtualenv.create_environment(env_dir, site_packages=False, clear=True, use_distribute=True)
         except ImportError:
             print "Failed to import virtualenv, is it installed?"
             sys.exit(1)
+
+    if options.requirements or len(args) > 1:
+        #activate the virtualenv environment
+        activate_file = os.path.join(env_dir,'bin','activate_this.py')
+        execfile(activate_file, dict(__file__=activate_file))
+        try:
+            import pip
+        except ImportError:
+            print "Failed to import pip, is it installed?"
+            sys.exit(1)
+
+    if options.requirements:
+        pip.main(initial_args=['install','-r',options.requirements])
+
+    if len(args) > 1:
+        pip.main(initial_args=['install']+args[1:])
 
 #    if not options.no_django:
 #        django_url = options.django_url
