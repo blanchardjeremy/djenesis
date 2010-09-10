@@ -1,27 +1,20 @@
 import imp
 import sys
-from os import path
+import os
+
 
 # Path to the django project (mainsite)
-PROJECT_DIR = path.abspath(path.dirname(__file__).decode('utf-8'))
+PROJECT_DIR = os.path.abspath(os.path.dirname(__file__).decode('utf-8'))
 # Path to the whole project (one level up from mainsite)
-TOP_DIR = path.abspath(path.dirname(PROJECT_DIR).decode('utf-8'))
-# Required python libraries should go in this directory 
-LIB_DIR = path.join(TOP_DIR,"lib")
+TOP_DIR = os.path.abspath(os.path.dirname(PROJECT_DIR).decode('utf-8'))
+# Required python libraries should go in this directory
+LIB_DIR = os.path.join(TOP_DIR, "lib")
 # Apps written for the project go in this directory
-APP_DIR = path.join(TOP_DIR,"apps")
+APP_DIR = os.path.join(TOP_DIR, "apps")
 # Prepend LIB_DIR, PROJECT_DIR, and APP_DIR to the PYTHONPATH
 for p in (PROJECT_DIR, LIB_DIR, APP_DIR, TOP_DIR):
     if p not in sys.path:
-        sys.path.insert(0,p)
-
-
-# --- Project configuration section ---
-# Use this section to configure per-project settings
-#       (settings that do not change between hosts).
-#
-# Use local_settings.py to configure per-host settings
-#       (such as database settings and admins).
+        sys.path.insert(0, p)
 
 
 INSTALLED_APPS = [
@@ -32,12 +25,6 @@ INSTALLED_APPS = [
     'django.contrib.admin',
 
     'mainsite',
-]
-
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = [
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -55,6 +42,12 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     'django.core.context_processors.request',
 ]
 
+TEMPLATE_LOADERS = [
+    'django.template.loaders.filesystem.load_template_source',
+    'django.template.loaders.app_directories.load_template_source',
+]
+
+
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -62,9 +55,6 @@ USE_I18N = False
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-# although not all choices may be available on all operating systems.
-# If running in a Windows environment this must be set to the same as your
-# system time zone.
 TIME_ZONE = 'America/Los_Angeles'
 
 # Language code for this installation. All choices can be found here:
@@ -79,7 +69,7 @@ SITE_ID = 1
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = path.join(TOP_DIR, 'media')
+MEDIA_ROOT = os.path.join(TOP_DIR, 'media')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -103,12 +93,13 @@ TEMPLATE_DIRS = [
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    path.join(TOP_DIR, 'templates'),
+    os.path.join(TOP_DIR, 'templates'),
 ]
 
 # Project-level fixtures
-if path.exists(path.join(PROJECT_DIR, 'fixtures')):
+if os.path.exists(os.path.join(PROJECT_DIR, 'fixtures')):
     FIXTURE_DIRS = ['fixtures']
+
 
 def filter_settings(settings_dict):
     """
@@ -119,11 +110,12 @@ def filter_settings(settings_dict):
         filter(lambda (k, v): k.isupper(), settings_dict.items())
     )
 
+
 def load_app_settings():
     """ Iterate over INSTALLED_APPS and load any settings.py """
     settings_dict = globals()
     for app in INSTALLED_APPS:
-        #skip mainsite or builtin django apps 
+        #skip mainsite or builtin django apps
         if app == 'mainsite' or app[:7] == 'django.':
             continue
 
@@ -139,6 +131,7 @@ def load_app_settings():
         except ImportError:
             pass
 
+
 def load_local_settings():
     """
     Load the settings defined in the mainsite.local_settings module.
@@ -148,8 +141,7 @@ def load_local_settings():
     """
     from mainsite import local_settings
 
-
-    settings_dict = globals() # dict of our main settings.
+    settings_dict = globals()  # dict of our main settings.
 
     # Update main settings with the local_settings.
     settings_dict.update(
