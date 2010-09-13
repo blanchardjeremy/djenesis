@@ -10,6 +10,6 @@ setup(name='djenesis',
     url='http://code.google.com/p/djenesis',
     scripts=['djenesis/djenesis.py'],
     packages=['djenesis'],
-    package_dir={'djenesis': 'djenesis'},
+    package_dir={'djenesis': '.'},
     package_data={'djenesis': ['project_template']},
 )
