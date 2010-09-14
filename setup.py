@@ -8,9 +8,8 @@ setup(name='djenesis',
     author='Concentric Sky',
     author_email='django@concentricsky.com',
     url='http://code.google.com/p/djenesis',
-    scripts=['djenesis/djenesis.py'],
+    scripts=['scripts/djenesis'],
     packages=['djenesis'],
-    package_dir={'djenesis': 'djenesis'},
     package_data={'djenesis':
 	['project_template/etc/*', 'project_template/mainsite/*', 'project_template/templates/*']},
 )

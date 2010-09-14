@@ -13,10 +13,7 @@ import subprocess
 import sys
 import tarfile
 import urllib2
-
-
-def package_data(file_name):
-    return os.path.join(os.path.split(__file__)[0], file_name)
+import djenesis
 
 
 def call_pip(env_dir, *args):
@@ -122,7 +119,7 @@ def main():
 
     template_dir = options.template_dir
     if template_dir is None:
-        template_dir = package_data("project_template")
+        template_dir = os.path.join(os.path.dirname(djenesis.__file__), 'project_template')
     if not os.path.exists(template_dir):
         print "%s: template directory does not exist!" % (template_dir,)
         sys.exit(1)
