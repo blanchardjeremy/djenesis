@@ -3,13 +3,14 @@
 from distutils.core import setup
 
 setup(name='djenesis',
-    version='0.9.2',
+    version='0.9.3',
     description='Bootstrap django projects using a standard project template',
     author='Concentric Sky',
     author_email='django@concentricsky.com',
     url='http://code.google.com/p/djenesis',
     scripts=['djenesis/djenesis.py'],
     packages=['djenesis'],
-    package_dir={'djenesis': '.'},
-    package_data={'djenesis': ['project_template']},
+    package_dir={'djenesis': 'djenesis'},
+    package_data={'djenesis':
+	['project_template/etc/*', 'project_template/mainsite/*', 'project_template/templates/*']},
 )
