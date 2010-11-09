@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='djenesis',
-    version='0.9.6',
+    version='0.9.7',
     description='Bootstrap django projects using a standard project template',
     author='Concentric Sky',
     author_email='django@concentricsky.com',
