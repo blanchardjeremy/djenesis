@@ -136,7 +136,11 @@ def main():
             import virtualenv
             #monkey patching in the logger is required here...
             virtualenv.logger = virtualenv.Logger([(virtualenv.Logger.level_for_integer(2), sys.stdout)])
-            virtualenv.create_environment(env_dir, site_packages=False, clear=True, use_distribute=True)
+            try:
+                virtualenv.create_environment(env_dir, site_packages=False, clear=True, use_distribute=True)
+            except TypeError:
+                # check if use_distribute failed, proceed anyway
+                virtualenv.create_environment(env_dir, site_packages=False, clear=True)
         except ImportError:
             print "Failed to import virtualenv, is it installed?"
             sys.exit(1)
