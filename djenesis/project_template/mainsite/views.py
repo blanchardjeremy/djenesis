@@ -9,3 +9,7 @@ def error500(request, template_name='500.html'):
         'MEDIA_URL': settings.MEDIA_URL,
     })
     return http.HttpResponseServerError(t.render(context))
+
+
+def robots_txt(request):
+    return http.HttpResponse("User-agent: *\nDisallow: /\n", content_type='text/plain');
