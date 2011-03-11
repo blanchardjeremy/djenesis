@@ -99,7 +99,8 @@ def do_copy(template_dir, destination_dir):
 
 def main():
     parser = optparse.OptionParser(usage="usage: %prog [options] <new-project-directory> [package...]")
-    parser.add_option("-t", "--template-dir", help="specify a different template directory")
+    parser.add_option("-d", "--template-dir", help="specify a different template directory", default=os.path.join(os.path.dirname(djenesis.__file__), 'project_templates'))
+    parser.add_option("-t", "--template", help="specify which template to use", default="default")
     parser.add_option("-e", "--virtualenv", help="additionally create a virtualenv environment", action="store_true", default=False)
     parser.add_option("", "--env", help="specify the name of the virtualenv directory to create", default="env")
     parser.add_option("", "--code", help="specify the name of the code directory to create", default="code")
@@ -117,11 +118,11 @@ def main():
     code_dir = os.path.join(project_dir, options.code)
     env_dir = os.path.join(project_dir, options.env)
 
-    template_dir = options.template_dir
-    if template_dir is None:
-        template_dir = os.path.join(os.path.dirname(djenesis.__file__), 'project_template')
+    template_dir = os.path.join(options.template_dir, options.template)
+    #if template_dir is None:
+        #template_dir = os.path.join(os.path.dirname(djenesis.__file__), 'project_template')
     if not os.path.exists(template_dir):
-        print "%s: template directory does not exist!" % (template_dir,)
+        print "%s: template does not exist!" % (template_dir,)
         sys.exit(1)
 
     if not os.path.exists(project_dir):

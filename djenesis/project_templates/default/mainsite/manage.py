@@ -2,16 +2,16 @@
 import sys
 import os
 
-# Path to the django project (mainsite)
-PROJECT_DIR = os.path.abspath(os.path.dirname(__file__).decode('utf-8'))
+# Path to mainsite
+PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 # Path to the whole project (one level up from mainsite)
-TOP_DIR = os.path.abspath(os.path.dirname(PROJECT_DIR).decode('utf-8'))
+TOP_DIR = os.path.dirname(PROJECT_DIR)
 # Required python libraries should go in this directory
 LIB_DIR = os.path.join(TOP_DIR, "lib")
 # Apps written for the project go in this directory
 APP_DIR = os.path.join(TOP_DIR, "apps")
-# Prepend LIB_DIR, PROJECT_DIR, and APP_DIR to the PYTHONPATH
-for p in (PROJECT_DIR, LIB_DIR, APP_DIR, TOP_DIR):
+
+for p in (APP_DIR, LIB_DIR, TOP_DIR):
     if p not in sys.path:
         sys.path.insert(0, p)
 

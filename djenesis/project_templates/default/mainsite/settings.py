@@ -3,18 +3,19 @@ import sys
 import os
 
 
-# Path to the django project (mainsite)
-PROJECT_DIR = os.path.abspath(os.path.dirname(__file__).decode('utf-8'))
+# Path to mainsite
+PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 # Path to the whole project (one level up from mainsite)
-TOP_DIR = os.path.abspath(os.path.dirname(PROJECT_DIR).decode('utf-8'))
+TOP_DIR = os.path.dirname(PROJECT_DIR)
 # Required python libraries should go in this directory
 LIB_DIR = os.path.join(TOP_DIR, "lib")
 # Apps written for the project go in this directory
 APP_DIR = os.path.join(TOP_DIR, "apps")
-# Prepend LIB_DIR, PROJECT_DIR, and APP_DIR to the PYTHONPATH
-for p in (PROJECT_DIR, LIB_DIR, APP_DIR, TOP_DIR):
+
+for p in (APP_DIR, LIB_DIR, TOP_DIR):
     if p not in sys.path:
         sys.path.insert(0, p)
+
 
 
 INSTALLED_APPS = [
@@ -96,49 +97,18 @@ TEMPLATE_DIRS = [
     os.path.join(TOP_DIR, 'templates'),
 ]
 
-# Project-level fixtures
-if os.path.exists(os.path.join(PROJECT_DIR, 'fixtures')):
-    FIXTURE_DIRS = ['fixtures']
 
 
-def filter_settings(settings_dict):
-    """
-    Filters a dict by uppercase keys.  Returns a new dictionary
-    which contains only the items which have uppercase keys.
-    """
-    return dict(
-        filter(lambda (k, v): k.isupper(), settings_dict.items())
-    )
 
-
-def load_local_settings():
-    """
-    Load the settings defined in the mainsite.local_settings module.
-
-    Once all settings are loaded, call local_settings.setup with a
-    dictionary of the final settings.
-    """
+try:
     from mainsite import local_settings
+    settings_dict = globals()
 
-    settings_dict = globals()  # dict of our main settings.
+    #update the global settings with all uppercase values from local_settings
+    settings_dict.update( dict(filter(lambda (k, v): k.isupper(), local_settings.__dict__.items())) )
 
-    # Update main settings with the local_settings.
-    settings_dict.update(
-        # Filter out functions and __special__ keys.
-        filter_settings(local_settings.__dict__)
-    )
-
-    # If local_settings has a 'setup' function then call it with our
-    # final settings dict.
+    #call local_settings.setup with a dictionary of the final settings if present
     if hasattr(local_settings, 'setup') and callable(local_settings.setup):
         local_settings.setup(settings_dict)
-
-# Load additional settings from the mainsite.local_settings module,
-# if it exists.
-try:
-    # Check if it exists.
-    imp.find_module('local_settings', [PROJECT_DIR])
 except ImportError:
     pass
-else:
-    load_local_settings()

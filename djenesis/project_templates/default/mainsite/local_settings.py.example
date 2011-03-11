@@ -1,7 +1,7 @@
 import os
 
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
-TOP_DIR = os.path.abspath(os.path.dirname(PROJECT_DIR))
+TOP_DIR = os.path.dirname(PROJECT_DIR)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
