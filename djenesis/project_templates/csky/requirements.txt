@@ -1,0 +1,10 @@
+Django
+PIL
+Jinja2
+South
+Fabric
+
+git+git://github.com/concentricsky/jingo.git
+git+ssh://git@git.concentricsky.com:2525/django/django-cachemodel.git
+git+ssh://git@git.concentricsky.com:2525/django/django-csky.git
+git+ssh://git@git.concentricsky.com:2525/python/confab.git
