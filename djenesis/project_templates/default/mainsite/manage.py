@@ -2,16 +2,12 @@
 import sys
 import os
 
-# Path to mainsite
-PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 # Path to the whole project (one level up from mainsite)
-TOP_DIR = os.path.dirname(PROJECT_DIR)
-# Required python libraries should go in this directory
-LIB_DIR = os.path.join(TOP_DIR, "lib")
+TOP_DIR = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 # Apps written for the project go in this directory
-APP_DIR = os.path.join(TOP_DIR, "apps")
+APPS_DIR = os.path.join(TOP_DIR, "apps")
 
-for p in (APP_DIR, LIB_DIR, TOP_DIR):
+for p in (APPS_DIR, TOP_DIR):
     if p not in sys.path:
         sys.path.insert(0, p)
 

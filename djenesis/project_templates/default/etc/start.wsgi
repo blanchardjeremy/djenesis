@@ -1,18 +1,21 @@
 import sys
 import os
-
-TOP_DIR = os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-LIB_DIR = os.path.join(TOP_DIR, 'lib')
-for p in (LIB_DIR, TOP_DIR):
-    if p not in sys.path:
-        sys.path.insert(0,p)
-
-activate_this = os.path.join(ENV_DIR, 'bin', 'activate_this.py')
-execfile(activate_this, dict(__file__=activate_this))
-
-from django.core.management import execute_manager
-os.environ['DJANGO_SETTINGS_MODULE'] = 'mainsite.settings'
-
 from django.core.handlers.wsgi import WSGIHandler
+
+# assume that we are on directory down from top_dir, e.g.: TOP_DIR/etc/start.wsgi
+TOP_DIR = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+
+# assume that the virtualenv is a directory named 'env' sibling to TOP_DIR
+ENV_DIR = os.path.join(os.path.dirname(TOP_DIR), 'env')
+
+sys.path.insert(0,TOP_DIR)
+
+# if virtualenv exists, actiavte it
+activate_this = os.path.join(ENV_DIR, 'bin', 'activate_this.py')
+if os.path.exists(activate_this):
+    execfile(activate_this, dict(__file__=activate_this))
+
+# call through to the django application
+os.environ['DJANGO_SETTINGS_MODULE'] = 'mainsite.settings'
 application = WSGIHandler()
 

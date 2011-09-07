@@ -19,6 +19,6 @@ if settings.DEBUG or getattr(settings, 'DEBUG_MEDIA', False):
     import re
     urlpatterns = patterns('',
         url(r'^%s/(?P<path>.*)$' % re.escape(settings.MEDIA_URL.strip('/')),
-          'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
+                'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
         url(r'^robots.txt$', 'mainsite.views.robots_txt'),
     ) + urlpatterns

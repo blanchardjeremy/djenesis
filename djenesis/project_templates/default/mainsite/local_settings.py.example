@@ -1,7 +1,7 @@
 import os
 
-PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
-TOP_DIR = os.path.dirname(PROJECT_DIR)
+# Path to the whole project (one level up from mainsite)
+TOP_DIR = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
