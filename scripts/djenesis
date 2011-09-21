@@ -1,160 +1,129 @@
 #!/usr/bin/env python
-"""
-djenesis is a tool for inflating a new Django project
-"""
 
-import optparse
-import StringIO
-import os
-import random
-import re
-import shutil
-import subprocess
 import sys
+import optparse
+import os
+import tempfile
 import tarfile
 import urllib2
+import shutil
+import subprocess
 import djenesis
 
 
-def call_pip(env_dir, *args):
-    pip_path = os.path.join(env_dir, 'bin', 'pip')
-    try:
-        return subprocess.call(' '.join((pip_path,) + args), shell=True)
-    except OSError, e:
-        print >> sys.stderr, "Execution failed", e
-    return -1
+class DjenesisScript(object):
 
+    def main(self,*args):
+        # Parse commandline arguments
+        self._parse_commandline()
 
-def generate_secret_key():
-    """Generate a random value for settings.SECRET_KEY."""
-    return ''.join(
-        [random.choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)]
-    )
-
-
-def my_copytree(src, dst, symlinks=False, ignore=None):
-    """Yanked and forked from python2.6/shutil.py
-
-    Modified to allow destination directory to exist
-    """
-    names = os.listdir(src)
-    if ignore is not None:
-        ignored_names = ignore(src, names)
-    else:
-        ignored_names = set()
-
-    if not os.path.isdir(dst):
-        os.makedirs(dst)
-    errors = []
-    for name in names:
-        if name in ignored_names:
-            continue
-        srcname = os.path.join(src, name)
-        dstname = os.path.join(dst, name)
-        try:
-            if symlinks and os.path.islink(srcname):
-                linkto = os.readlink(srcname)
-                os.symlink(linkto, dstname)
-            elif os.path.isdir(srcname):
-                my_copytree(srcname, dstname, symlinks, ignore)
+        # Inflate project from url, or default template
+        if self.template:
+            if any(self.template.startswith(scm) for scm in ('git+','svn+','hg+')):
+                self._inflate_template_from_repo()
             else:
-                shutil.copy2(srcname, dstname)
-            # XXX What about devices, sockets etc.?
-        except (IOError, os.error), why:
-            errors.append((srcname, dstname, str(why)))
-        # catch the Error from the recursive copytree so that we can
-        # continue with other files
-        except shutil.Error, err:
-            errors.extend(err.args[0])
-    try:
-        shutil.copystat(src, dst)
-    except OSError, why:
-        if WindowsError is not None and isinstance(why, WindowsError):
-            # Copying file access times may fail on Windows
-            pass
+                self._inflate_template_from_url()
         else:
-            errors.extend((src, dst, str(why)))
-    if errors:
-        raise shutil.Error, errors
+            self._inflate_template_from_default()
+
+        # Build virtualenv if needed
+        if self.virtualenv_directory:
+            self._build_virtualenv()
+            # Bootstrap virtualenv packages
+            self._install_requirements()
+
+    def _parse_commandline(self):
+        parser = optparse.OptionParser(usage="Usage: %prog <output_directory> [options] [package...]")
+        parser.add_option("-e", "--env-directory", help="Specify the directory to create the virtualenv at")
+        parser.add_option("",   "--no-virtualenv", action='store_true', default=False, help="Don't create a virtualenv")
+        parser.add_option("-t", "--template", help="Specify template URL to inflate from")
+
+        (options, args) = parser.parse_args()
+        if len(args) < 1:
+            parser.print_help()
+            sys.exit(1)
+
+        self.code_directory = self._real_path(args.pop(0))
+        self.pip_packages = args
+
+        if getattr(options, 'no_virtualenv',False):
+            self.virtualenv_directory = None
+        else:
+            self.virtualenv_directory = getattr(options, 'env_directory',None) or self._real_path('env')
+
+        self.template = getattr(options, 'template', None)
+
+    def _inflate_template_from_repo(self):
+        scm, url = self.template.split('+')
+        if scm == 'git':
+            call_args = ["git", "clone", url, self.code_directory]
+        elif scm == 'svn':
+            call_args = ["svn", "checkout", url, self.code_directory]
+        elif scm == 'hg':
+            call_args = ["hg", "clone", url, self.code_directory]
+        subprocess.call(call_args)
+
+    def _inflate_template_from_url(self):
+        temp_file = tempfile.mktemp()
+
+        # fetch URL and cache it locally
+        uh,fh = None,None
+        try:
+            uh = urllib2.urlopen(self.template)
+            fh = open(temp_file, 'w+')
+            fh.write(uh.read())
+        except:
+            pass
+        finally:
+            if fh:
+                fh.close()
+            if uh:
+                uh.close()
+
+        # try to extract to code directory
+        if os.path.exists(temp_file):
+            try:
+                tar = tarfile.open(temp_file)
+                tar.extractall(path=self.code_directory)
+            except tarfile.ReadError as e:
+                print("Template '%s' is not a tar file." % (self.template,))
+            finally:
+                tar.close()
+            os.remove(temp_file)
+
+    def _inflate_template_from_default(self, name='default'):
+        template_path = os.path.join(os.path.dirname(djenesis.__file__), 'project_templates', name)
+        print("inflating from %s" % (template_path,))
+        shutil.copytree(template_path, self.code_directory, symlinks=True)
+
+    def _build_virtualenv(self):
+        if not self.virtualenv_directory:
+            return
+        cmd_args = ["virtualenv", "--no-site-packages", "--distribute", self.virtualenv_directory]
+        subprocess.call(cmd_args)
+
+    def _install_requirements(self):
+        template_requirements = os.path.join(self.code_directory, 'requirements.txt')
+        if os.path.exists(template_requirements):
+            self._env_pip("install", "-r", template_requirements)
+        else:
+            # no requirements file was found, no packages were specified, install Django then
+            if len(self.pip_packages) < 1:
+                self.pip_packages = ['Django']
+
+        if len(self.pip_packages) > 0:
+            self._env_pip("install", *self.pip_packages)
+
+    def _real_path(self, s, cwd='.'):
+        return os.path.abspath(os.path.join(cwd, s))
+
+    def _env_pip(self, *args):
+        subprocess.call([os.path.join(self.virtualenv_directory, 'bin', 'pip')] + list(args))
 
 
-def do_copy(template_dir, destination_dir):
-    my_copytree(template_dir, destination_dir, symlinks=True, ignore=shutil.ignore_patterns('.svn*'))
 
-    secret_key = generate_secret_key()
-
-    settings_path = os.path.join(destination_dir, 'mainsite', 'settings.py')
-    if os.path.exists(settings_path):
-        settings_file = open(settings_path, 'r')
-        settings_data = settings_file.read()
-        settings_file.close()
-        settings_file = open(settings_path, 'w')
-        settings_data = re.sub(r"(?<=SECRET_KEY = ')'", secret_key + "'", settings_data)
-        settings_file.write(settings_data)
-        settings_file.close()
-    else:
-        print "Could not locate %s. Did not generate SECRET_KEY" % (settings_path)
-    return 0
-
-
-def main():
-    parser = optparse.OptionParser(usage="usage: %prog [options] <new-project-directory> [package...]")
-    parser.add_option("-d", "--template-dir", help="specify a different template directory", default=os.path.join(os.path.dirname(djenesis.__file__), 'project_templates'))
-    parser.add_option("-t", "--template", help="specify which template to use", default="default")
-    parser.add_option("-e", "--virtualenv", help="additionally create a virtualenv environment", action="store_true", default=False)
-    parser.add_option("", "--env", help="specify the name of the virtualenv directory to create", default="env")
-    parser.add_option("", "--code", help="specify the name of the code directory to create", default="code")
-    parser.add_option("-r", "--requirements", help="specify a requirements.txt file to bootstrap with")
-
-    (options, args) = parser.parse_args()
-    if len(args) < 1:
-        parser.print_help()
-        sys.exit(1)
-
-
-    project_dir = os.path.abspath(args[0])
-    code_dir = os.path.join(project_dir, options.code)
-    env_dir = os.path.join(project_dir, options.env)
-
-    template_dir = os.path.join(options.template_dir, options.template)
-    if not os.path.exists(template_dir):
-        print "%s: template does not exist!" % (template_dir,)
-        sys.exit(1)
-
-    if not os.path.exists(project_dir):
-        os.makedirs(project_dir)
-
-    ret = do_copy(template_dir, code_dir)
-    if ret != 0:
-        sys.exit(ret)
-
-
-    if options.requirements or len(args) > 1:
-        options.virtualenv = True
-
-
-    template_requirements = os.path.join(code_dir, 'requirements.txt')
-    if os.path.exists(template_requirements):
-        options.virtualenv = True
-
-
-    if options.virtualenv:
-        subprocess.call('virtualenv --no-site-packages --distribute %s' % (env_dir,), shell=True)
-
-    if options.virtualenv:
-        #activate the virtualenv environment
-        activate_file = os.path.join(env_dir, 'bin', 'activate_this.py')
-        execfile(activate_file, dict(__file__=activate_file))
-
-    if options.requirements:
-        call_pip(env_dir, 'install', '-r', options.requirements)
-
-    if os.path.exists(template_requirements):
-        call_pip(env_dir, 'install', '-r', template_requirements)
-
-    if len(args) > 1:
-        call_pip(env_dir, *(('install',) + tuple(args[1:])))
 
 
 if __name__ == '__main__':
-    main()
+    script = DjenesisScript()
+    script.main(*sys.argv)

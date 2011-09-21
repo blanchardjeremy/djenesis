@@ -2,7 +2,7 @@ import sys
 import os
 from django.core.handlers.wsgi import WSGIHandler
 
-# assume that we are on directory down from top_dir, e.g.: TOP_DIR/etc/start.wsgi
+# assume that we are in a directory that is direct descendant of top_dir, e.g.: TOP_DIR/etc/start.wsgi
 TOP_DIR = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 
 # assume that the virtualenv is a directory named 'env' sibling to TOP_DIR
