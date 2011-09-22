@@ -34,7 +34,7 @@ class DjenesisScript(object):
 
     def _parse_commandline(self):
         parser = optparse.OptionParser(usage="Usage: %prog <output_directory> [options] [package...]")
-        parser.add_option("-e", "--env-directory", help="Specify the directory to create the virtualenv at")
+        parser.add_option("-e", "--virtualenv", help="Specify the directory to create the virtualenv at")
         parser.add_option("",   "--no-virtualenv", action='store_true', default=False, help="Don't create a virtualenv")
         parser.add_option("-t", "--template", help="Specify template URL to inflate from")
 
@@ -49,7 +49,9 @@ class DjenesisScript(object):
         if getattr(options, 'no_virtualenv',False):
             self.virtualenv_directory = None
         else:
-            self.virtualenv_directory = getattr(options, 'env_directory',None) or self._real_path('env')
+            self.virtualenv_directory = getattr(options, 'virtualenv',None)
+            if self.virtualenv_directory is None:
+                self.virtualenv_directory = self._real_path(os.path.join(os.path.dirname(self.code_directory), 'env-'+os.path.basename(self.code_directory)))
 
         self.template = getattr(options, 'template', None)
 

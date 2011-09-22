@@ -37,7 +37,7 @@ Examples
 
 ``djenesis mynewproject``
     | generates ./mynewproject from default template.
-    | creates virtualenv at ./env and installs latest Django
+    | creates virtualenv at ./env-mynewproject and installs latest Django
 
 
 ``djenesis foobar --no-virtualenv``
