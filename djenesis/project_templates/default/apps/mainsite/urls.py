@@ -1,7 +1,8 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns, include, url
 from django.conf import settings
-
 from django.contrib import admin
+
+
 admin.autodiscover()
 
 handler500 = 'mainsite.views.error500'
@@ -14,7 +15,7 @@ urlpatterns = patterns('',
 )
 
 
-if settings.DEBUG or getattr(settings, 'DEBUG_MEDIA', False):
+if getattr(settings, 'DEBUG', False) or getattr(settings, 'DEBUG_MEDIA', False):
     # If we are in debug mode, prepend a rule to urlpatterns to serve the static media
     import re
     urlpatterns = patterns('',

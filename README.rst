@@ -17,33 +17,6 @@ What Djenesis Is Not
 | Djenesis is not a django app.  It is a python commandline tool.
 
 
-
-Default Project Structure
--------------------------
-If you do not specify a template when you invoke Djenesis, it will inflate its default project structure. 
-For example if you called the command ``djenesis mynewproject`` the following directory structure would be created::
-
-    ./mynewproject
-        ./mynewproject/apps
-        ./mynewproject/apps/mainsite/manage.py
-        ./mynewproject/apps/mainsite/settings.py
-        ./mynewproject/apps/mainsite/settings_local.py
-        ./mynewproject/apps/mainsite/start.wsgi
-        ./mynewproject/apps/mainsite/urls.py
-        ./mynewproject/fixtures/
-        ./mynewproject/media/
-        ./mynewproject/media/uploads
-        ./mynewproject/templates/base.html
-        ./mynewproject/.gitignore
-    ./env
-        ./env/lib/**/django
-
-
-| You'll notice that ``mainsite`` is the default point for all things django related.
-| Only the ``apps`` directory is added to the PYTHON_PATH.
-| Djenesis automatically created a virtualenv at `./env` and installed the latest version of Django because we specified no other packages.
-
-
 Usage
 -----
 ::
@@ -84,3 +57,34 @@ Examples
     | uses git to clone the repository into ./mywip/code
     | generates a virtualenv at ./mywip/env
     | if requirements.txt exists at toplevel directory in repo, pip installs any packages present.
+
+
+Default Project Structure
+-------------------------
+If you do not specify a template when you invoke Djenesis, it will inflate its default project structure. 
+For example if you called the command ``djenesis mynewproject`` the following directory structure would be created::
+
+    ./mynewproject
+        ./mynewproject/apps
+        ./mynewproject/apps/mainsite/manage.py
+        ./mynewproject/apps/mainsite/settings.py
+        ./mynewproject/apps/mainsite/settings_project.py
+        ./mynewproject/apps/mainsite/settings_local.py.example
+        ./mynewproject/apps/mainsite/django.wsgi
+        ./mynewproject/apps/mainsite/urls.py
+        ./mynewproject/apps/mainsite/views.py
+        ./mynewproject/fixtures/
+        ./mynewproject/media/
+        ./mynewproject/media/uploads
+        ./mynewproject/templates/base.html
+        ./mynewproject/.gitignore
+    ./env
+        ./env/lib/**/django
+
+
+| You'll notice that ``mainsite`` is the default point for all things django related.
+| Only the ``apps`` directory is added to the PYTHON_PATH.
+| Djenesis automatically created a virtualenv at `./env` and installed the latest version of Django because we specified no other packages.
+
+
+
