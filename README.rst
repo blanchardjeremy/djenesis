@@ -68,15 +68,17 @@ For example if you called the command ``djenesis mynewproject`` the following di
         ./mynewproject/apps
         ./mynewproject/apps/mainsite/manage.py
         ./mynewproject/apps/mainsite/settings.py
-        ./mynewproject/apps/mainsite/settings_project.py
-        ./mynewproject/apps/mainsite/settings_local.py.example
+        ./mynewproject/apps/mainsite/local_settings.py.example
         ./mynewproject/apps/mainsite/django.wsgi
         ./mynewproject/apps/mainsite/urls.py
         ./mynewproject/apps/mainsite/views.py
         ./mynewproject/fixtures/
         ./mynewproject/media/
-        ./mynewproject/media/uploads
+        ./mynewproject/uploads/
+        ./mynewproject/static/
         ./mynewproject/templates/base.html
+        ./mynewproject/templates/500.html
+        ./mynewproject/templates/404.html
         ./mynewproject/.gitignore
     ./env
         ./env/lib/**/django

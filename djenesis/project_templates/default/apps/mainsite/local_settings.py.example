@@ -1,8 +1,10 @@
+from settings import *
+from mainsite import TOP_DIR
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'America/Los_Angeles'
 LANGUAGE_CODE = 'en-us'
 
 DATABASES = {
@@ -16,7 +18,6 @@ DATABASES = {
     }
 }
 
-
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -27,17 +28,8 @@ CACHES = {
     }
 }
 
-def setup(settings):
-    """
-    This function is called before the final settings are passed to
-    django.
 
-    This hook can be used to modify the value of settings
-    rather than overwriting them.
-    """
-    # Ex: install an app:
-    # settings['INSTALLED_APPS'].extend([
-    #     'my_debug_app',
-    # ])
-    pass
+# Example of how to include debug toolbar in local_settings
+MIDDLEWARE_CLASSES.insert(0,'debug_toolbar.middleware.DebugToolbarMiddleware')
+#INSTALLED_APPS += ['debug_toolbar']
 
