@@ -8,7 +8,6 @@ import tarfile
 import urllib2
 import shutil
 import subprocess
-import djenesis
 
 
 class DjenesisScript(object):
@@ -94,7 +93,7 @@ class DjenesisScript(object):
             os.remove(temp_file)
 
     def _inflate_template_from_default(self, name='default'):
-        template_path = os.path.join(os.path.dirname(djenesis.__file__), 'project_templates', name)
+        template_path = os.path.realpath(os.path.join(sys.prefix, 'share', 'djenesis', 'templates', name))
         print("inflating from %s" % (template_path,))
         shutil.copytree(template_path, self.code_directory, symlinks=True)
 
