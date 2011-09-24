@@ -65,28 +65,24 @@ If you do not specify a template when you invoke Djenesis, it will inflate its d
 For example if you called the command ``djenesis mynewproject`` the following directory structure would be created::
 
     ./mynewproject
+        ./mynewproject/manage.py
+        ./mynewproject/requirements.txt
         ./mynewproject/apps
-        ./mynewproject/apps/mainsite/manage.py
         ./mynewproject/apps/mainsite/settings.py
         ./mynewproject/apps/mainsite/local_settings.py.example
-        ./mynewproject/apps/mainsite/django.wsgi
         ./mynewproject/apps/mainsite/urls.py
         ./mynewproject/apps/mainsite/views.py
-        ./mynewproject/fixtures/
-        ./mynewproject/media/
+        ./mynewproject/apps/mainsite/media/css/screen.css
+        ./mynewproject/apps/mainsite/templates/base.html
+        ./mynewproject/apps/mainsite/templates/500.html
+        ./mynewproject/apps/mainsite/templates/404.html
+        ./mynewproject/etc/django.wsgi
+        ./mynewproject/etc/fixtures/
         ./mynewproject/uploads/
         ./mynewproject/static/
-        ./mynewproject/templates/base.html
-        ./mynewproject/templates/500.html
-        ./mynewproject/templates/404.html
-        ./mynewproject/.gitignore
-    ./env
-        ./env/lib/**/django
-
 
 | You'll notice that ``mainsite`` is the default point for all things django related.
 | Only the ``apps`` directory is added to the PYTHON_PATH.
-| Djenesis automatically created a virtualenv at `./env` and installed the latest version of Django because we specified no other packages.
 
 
 
