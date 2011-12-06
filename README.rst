@@ -16,6 +16,11 @@ What Djenesis Is Not
 --------------------
 | Djenesis is not a django app.  It is a python commandline tool.
 
+Installation
+------------
+If you wish to use Djenesis universally, you can install it like so:
+
+``pip install git+ssh://git@github.com/concentricsky/djenesis.git``
 
 Usage
 -----
