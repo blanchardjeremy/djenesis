@@ -51,13 +51,17 @@ Examples
 ``djenesis mynewproject -e ~/.virtualenvs/mynewproject -t http://example.com/django/random-django-template.tar.gz``
     | downloads and extracts the tar file into ./mynewproject
     | generates a virtualenv at ~/.virtualenvs/mynewproject
-    | checks the templates for a requirements.txt, if present will pip install all packages into the virtualenv.
+    | checks the template for a requirements.txt, if present will pip install all packages into the virtualenv.
 
 ``djenesis mywip/code -e mywip/env -t git+git@github.com:wittyusername/respository.git``
     | uses git to clone the repository into ./mywip/code
     | generates a virtualenv at ./mywip/env
     | if requirements.txt exists at toplevel directory in repo, pip installs any packages present.
 
+``djenesis mynewproject/code -e mynewproject/env --template=~/projects/django-templates/normal``
+    | copies the project template from a local directory at ~/projects/django-templates/normal into ./mynewproject/code
+    | generates a virtualenv at ./mynewproject/env
+    | checks the template for a requirements.txt, if present will pip install all packages into the virtualenv.
 
 Default Project Structure
 -------------------------

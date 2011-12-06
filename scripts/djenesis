@@ -20,8 +20,10 @@ class DjenesisScript(object):
         if self.template:
             if any(self.template.startswith(scm) for scm in ('git+','svn+','hg+')):
                 self._inflate_template_from_repo()
-            else:
+            elif '.tar' in self.template:
                 self._inflate_template_from_url()
+            else:
+                self._inflate_template_from_local()
         else:
             self._inflate_template_from_default()
 
@@ -91,6 +93,10 @@ class DjenesisScript(object):
             finally:
                 tar.close()
             os.remove(temp_file)
+
+    def _inflate_template_from_local(self):
+        call_args = ["cp", "-r", self.template, self.code_directory]
+        subprocess.call(call_args)
 
     def _inflate_template_from_default(self, name='default'):
         template_path = os.path.realpath(os.path.join(sys.prefix, 'share', 'djenesis', 'templates', name))
