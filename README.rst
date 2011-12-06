@@ -25,7 +25,7 @@ Usage: djenesis <output_directory> [options] [package...]
 
 Options:
   -h, --help            show this help message and exit
-  -e ENV_DIRECTORY, --env-directory=ENV_DIRECTORY
+  -e ENV_DIRECTORY, --virtualenv=VIRTUALENV
                         Specify the directory to create the virtualenv at
   --no-virtualenv       Don't create a virtualenv
   -t TEMPLATE, --template=TEMPLATE
@@ -45,8 +45,8 @@ Examples
     | no virtualenv is created.
 
 ``djenesis theproject/code --virtualenv=theproject/env Django==1.1 psycopg2``
-    | generates ./foobar/code from the default template.
-    | initializes a virtualenv at ./foobar/env and installs Django-1.1 and psycopg2
+    | generates ./theproject/code from the default template.
+    | initializes a virtualenv at ./theproject/env and installs Django-1.1 and psycopg2
 
 ``djenesis mynewproject -e ~/.virtualenvs/mynewproject -t http://example.com/django/random-django-template.tar.gz``
     | downloads and extracts the tar file into ./mynewproject
